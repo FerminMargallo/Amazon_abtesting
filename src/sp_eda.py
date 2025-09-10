@@ -39,4 +39,7 @@ def eda_preliminar(df):
     print(col.upper())
     print(df[col].value_counts())
     print('-----------')
+  print('-------------')
+  print('Estadisticos númericos')
+  display(df.describe().T)
 
