@@ -1,4 +1,4 @@
-Proyecto de A/B Testing en Amazon
+# Proyecto de A/B Testing en Amazon
 
 Proyecto de análisis de datos para evaluar el impacto de dos variantes (grupo **A** y grupo **B**) en métricas de conversión y comportamiento de usuarios dentro de un contexto de e-commerce.
 
