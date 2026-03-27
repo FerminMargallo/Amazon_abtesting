@@ -2,25 +2,20 @@ import pandas as pd
 from IPython.display import display
 
 def baseline_eda(df: pd.DataFrame) -> None:
-    """
-    Performs a preliminary exploratory data analysis on a given DataFrame.
+  """
+    Performs a comprehensive baseline Exploratory Data Analysis (EDA) on a DataFrame.
 
-    This analysis includes:
-    - A random sample of 5 rows from the DataFrame.
-    - General DataFrame information (data types, non-null counts, etc.).
-    - Percentage of missing values per column.
-    - Count of duplicated rows.
-    - Value distributions for categorical columns.
-    - Summary statistics for numerical columns.
+    This function generates a quick overview of the dataset by displaying a random
+    sample, structural dimensions, data types, missing value percentages, duplicate
+    row counts, categorical value distributions, and summary statistics for
+    numerical columns.
 
-    Parameters:
-        df (pd.DataFrame): The DataFrame to analyze.
+    Args:
+        df (pandas.DataFrame): The input DataFrame to be analyzed.
 
     Returns:
-        None
+        None: The function prints and displays the EDA results directly.
     """
-
-def baseline_eda(df):
   print('--- RANDOM SAMPLE ---')
   display(df.sample(5))
 
@@ -37,7 +32,7 @@ def baseline_eda(df):
   print(f'Total duplicated rows: {df.duplicated().sum()}')
 
   print('\n--- CATEGORICAL VALUE COUNTS ---')
-    # Included 'category' alongside 'object' just in case you optimize data types later
+   
   for col in df.select_dtypes(include=['object', 'category']).columns:
       print(f"\n{col.upper()}:")
       print(df[col].value_counts(dropna=False))
