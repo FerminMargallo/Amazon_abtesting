@@ -65,8 +65,6 @@ Amazon_abtesting/
 └── requirements.txt
 ```
 
-> Adjust file/folder names to match your actual repo.
-
 ---
 
 ## How to Run
