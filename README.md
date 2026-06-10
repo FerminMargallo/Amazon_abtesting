@@ -1,282 +1,91 @@
-# Amazon A/B Testing Analysis
+# Amazon A/B Testing & Statistical Analysis
 
-This repository contains an end-to-end exploratory and statistical workflow for analyzing an Amazon-style A/B test experiment. It includes:
+End-to-end A/B testing workflow comparing two groups with a rigorous statistical pipeline — from assumption checks to the appropriate significance test — built as reusable, tested Python modules.
 
-- data preparation utilities,
-- exploratory data analysis (EDA) helpers,
-- missing-value and outlier analysis tools,
-- A/B test statistical checks,
-- and Jupyter notebooks that show the full analysis flow.
+**Stack:** Python (Pandas, SciPy, Matplotlib) · pytest
 
 ---
 
-## Table of Contents
+## Overview
 
-1. [Project Overview](#project-overview)
-2. [Repository Structure](#repository-structure)
-3. [Tech Stack](#tech-stack)
-4. [Setup Instructions](#setup-instructions)
-5. [Data Files](#data-files)
-6. [How to Run the Analysis](#how-to-run-the-analysis)
-7. [Module-by-Module API Reference](#module-by-module-api-reference)
-8. [Testing](#testing)
-9. [Typical Workflow](#typical-workflow)
-10. [Known Limitations and Notes](#known-limitations-and-notes)
-11. [Contributing](#contributing)
+This project evaluates whether a change (variant B) produces a statistically significant difference versus the control (variant A). Rather than jumping straight to a t-test, the workflow first **checks the assumptions** (normality, equal variances) and then selects the correct test accordingly — the way A/B testing should be done in practice.
 
 ---
 
-## Project Overview
+## Dataset
 
-This repository was developed as part of a **data analytics bootcamp** project focused on applying real-world data cleaning, exploratory analysis, and hypothesis testing workflows in Python.
+- **Source:** [add source — e.g. Kaggle / synthetic A/B test dataset]
+- **Size:** [add rows × columns]
+- **Groups compared:** Control (A) vs Variant (B)
+- **Metric analysed:** [e.g. conversion rate / average order value / time on page]
 
-The project is designed to support practical A/B testing analysis with Python.
+---
 
-It provides utility functions to:
+## Methodology
 
-- standardize and clean tabular data,
-- perform a baseline EDA,
-- visualize and diagnose numerical/categorical distributions,
-- detect outliers,
-- impute missing values,
-- and run common A/B statistical checks (normality, homoscedasticity, Mann–Whitney U).
+The statistical decision pipeline:
 
-The notebooks in `notebooks/` illustrate how these pieces connect in a real workflow.
+1. **Normality check** — Shapiro-Wilk test on each group.
+2. **Equal-variance check** — Levene's test.
+3. **Significance test** — based on the assumption results:
+   - If assumptions hold → parametric test (t-test).
+   - If assumptions are violated → **Mann-Whitney U** (non-parametric).
+4. **Interpretation** — p-value, effect direction, and a practical business conclusion.
+
+This logic is implemented as reusable functions and covered by **unit tests** (`pytest`).
+
+---
+
+## Key Findings
+
+The A/B test was a clear success for the new variant (**Group B**).
+
+- **Conversion & Revenue:** Group B significantly increased both the conversion rate (p = 0.0045) and the total value spent (p = 0.0038) versus the control.
+- **Basket size:** Users in Group B bought significantly more items per transaction (quantity, p = 0.0033).
+- **Engagement:** Session duration remained statistically identical (p = 0.6460) — a positive signal, since the new variant drives more sales and larger baskets *without* requiring users to spend more time on the site.
+
+**Recommendation:** Roll out the Group B variant to 100% of users.
 
 ---
 
 ## Repository Structure
 
-```text
+```
 Amazon_abtesting/
+├── README.md
 ├── data/
-│   ├── data_raw.csv
-│   ├── data_cleaned.csv
-│   └── data_processed.csv
 ├── notebooks/
-│   ├── 01.baseline_eda.ipynb
-│   ├── 02.cleaning_data.ipynb
-│   ├── 03.null_values.ipynb
-│   └── 04.ab_testing.ipynb
 ├── src/
-│   ├── abtest.py
-│   ├── data_cleaning_utils.py
-│   ├── eda_utils.py
-│   └── null_values.py
+│   ├── data_cleaning.py
+│   ├── eda.py
+│   └── statistical_tests.py
 ├── tests/
-│   └── test_functions.py
-├── requirements.txt
-└── README.md
+│   └── test_statistical_tests.py
+├── images/
+└── requirements.txt
 ```
 
----
-
-## Tech Stack
-
-Core libraries used by this project include:
-
-- `pandas` for data manipulation,
-- `numpy` for numerical operations,
-- `matplotlib` and `seaborn` for visualization,
-- `scipy` for statistical tests,
-- `scikit-learn` for imputation (`KNNImputer`, `IterativeImputer`),
-- `pytest` for automated tests,
-- Jupyter ecosystem for notebook-based analysis.
+> Adjust file/folder names to match your actual repo.
 
 ---
 
-## Setup Instructions
-
-### 1) Clone the repository
+## How to Run
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/FerminMargallo/Amazon_abtesting.git
 cd Amazon_abtesting
-```
-
-### 2) Create and activate a virtual environment
-
-**macOS/Linux**
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-```
-
-**Windows (PowerShell)**
-
-```powershell
-python -m venv .venv
-.venv\Scripts\Activate.ps1
-```
-
-### 3) Install dependencies
-
-```bash
 pip install -r requirements.txt
-```
 
-### 4) Run tests
+# Run the analysis
+jupyter notebook
 
-```bash
-pytest -q
-```
-
----
-
-## Data Files
-
-The `data/` directory includes multiple dataset stages:
-
-- `data_raw.csv`: raw input data,
-- `data_cleaned.csv`: post-cleaning version,
-- `data_processed.csv`: prepared data for downstream modeling/testing.
-
-> Tip: Keep raw files immutable and only modify cleaned/processed artifacts.
-
----
-
-## How to Run the Analysis
-
-Open notebooks in order to follow the full analytical storyline:
-
-1. `notebooks/01.baseline_eda.ipynb` — initial exploration,
-2. `notebooks/02.cleaning_data.ipynb` — cleaning and formatting,
-3. `notebooks/03.null_values.ipynb` — missing-value strategy,
-4. `notebooks/04.ab_testing.ipynb` — statistical A/B testing.
-
-Launch Jupyter Lab/Notebook:
-
-```bash
-jupyter lab
-```
-
-(or `jupyter notebook` if preferred)
-
----
-
-## Module-by-Module API Reference
-
-### `src/data_cleaning_utils.py`
-
-#### `lowercase_strings(df)`
-Converts all object-type column values to lowercase (in-place).
-
-#### `convert_commas_to_dots(df)`
-For object columns:
-- replaces decimal commas with dots,
-- attempts conversion to `float64`.
-
-Columns that cannot be cast remain as text.
-
-#### `replace_spaces_with_underscores(df)`
-Replaces spaces with underscores in object-type column values.
-
----
-
-### `src/eda_utils.py`
-
-#### `baseline_eda(df)`
-Prints/displays:
-- random sample,
-- shape,
-- `info()`,
-- missing-value percentage,
-- duplicate count,
-- categorical value counts,
-- numerical summary statistics.
-
----
-
-### `src/null_values.py`
-
-#### `subplot_col_cat(df)`
-Creates countplots for categorical columns.
-
-#### `subplot_col_num(df)`
-Creates histogram + boxplot pairs for numerical columns.
-
-#### `calculate_outliers(df, cols)`
-Computes and prints outlier counts and percentages using IQR bounds.
-
-#### `impute_iterative(df, col_list)`
-Imputes selected columns with `IterativeImputer` and appends `*_iterative` columns.
-
-#### `impute_knn(df, col_list)`
-Imputes selected columns with `KNNImputer` and appends `*_knn` columns.
-
----
-
-### `src/abtest.py`
-
-#### `explore_ab_groups(df, group_col)`
-Shows descriptive statistics split by A/B test group.
-
-#### `check_normality(df, metric_cols)`
-Runs Shapiro–Wilk normality test by metric.
-
-#### `check_homoscedasticity(df, group_col, metric_cols)`
-Runs Levene’s test to compare group variances.
-
-#### `perform_mann_whitney(df, group_col, metric_cols)`
-Runs the Mann–Whitney U test for two independent groups.
-
----
-
-## Testing
-
-Tests are located in `tests/test_functions.py` and currently cover:
-
-- outlier detection behavior,
-- empty-data edge handling for outliers,
-- normality test output sanity.
-
-Run tests:
-
-```bash
-pytest -q
+# Run the unit tests
+pytest
 ```
 
 ---
 
-## Typical Workflow
+## Author
 
-A practical analysis sequence for this repository:
-
-1. Load raw data (`data/data_raw.csv`).
-2. Apply text/format cleaning utilities from `src/data_cleaning_utils.py`.
-3. Run `baseline_eda()` from `src/eda_utils.py`.
-4. Analyze distributions and outliers with `src/null_values.py` helpers.
-5. Handle nulls using iterative or KNN imputation.
-6. Run A/B statistical checks from `src/abtest.py`.
-7. Record results and business conclusions in notebooks/reports.
-
----
-
-## Known Limitations and Notes
-
-- This is a **bootcamp learning project**, so the code prioritizes clarity and educational readability over production hardening.
-- Several utility functions are designed for notebook usage and print results instead of returning structured outputs.
-- Some plotting/statistical helpers assume expected input schema and valid numeric columns.
-- `perform_mann_whitney` expects exactly two groups in the specified group column.
-- The repository currently uses a broad `requirements.txt` environment (includes Jupyter ecosystem packages); you may optionally slim this for production pipelines.
-
----
-
-## Contributing
-
-1. Create a feature branch.
-2. Implement changes with clear, focused commits.
-3. Run tests locally before opening a PR.
-4. Add/update tests when adding functionality.
-5. Update this README when behavior or APIs change.
-
----
-
-If useful, future improvements could include:
-
-- stronger type validation and explicit exceptions,
-- return-value-oriented APIs (in addition to notebook prints),
-- CI integration for automated linting/tests,
-- and richer statistical reporting objects.
-
+**Fermín Margallo** — Data Analyst
+[GitHub](https://github.com/FerminMargallo) · [LinkedIn](https://www.linkedin.com/in/fermín-margallo-remón) · [Email](mailto:fmargalloremon@gmail.com)
