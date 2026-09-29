@@ -14,7 +14,6 @@ This project evaluates whether a change (variant B) produces a statistically sig
 
 ## Dataset
 
-- **Source:** academic
 - **Size:** 2000x21
 - **Groups compared:** Control (A) vs Variant (B)
 - **Metric analysed:** Conversion rate
