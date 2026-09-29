@@ -14,10 +14,10 @@ This project evaluates whether a change (variant B) produces a statistically sig
 
 ## Dataset
 
-- **Source:** [add source — e.g. Kaggle / synthetic A/B test dataset]
-- **Size:** [add rows × columns]
+- **Source:** academic
+- **Size:** 2000x21
 - **Groups compared:** Control (A) vs Variant (B)
-- **Metric analysed:** [e.g. conversion rate / average order value / time on page]
+- **Metric analysed:** Conversion rate
 
 ---
 
